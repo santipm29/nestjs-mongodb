@@ -2,8 +2,9 @@
 import { User } from './interfaces/user.interface';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/user.dto';
-import { Controller, Delete, Get, Post, Put, Body, Param } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Put, Body, Param, BadRequestException, NotFoundException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { isValidObjectId } from 'mongoose';
 
 
 @ApiTags('Users')
@@ -16,8 +17,11 @@ export class UsersController {
     }
 
     @Get(':id')
-    async getUser(@Param('id') id: string): Promise<User> {
-        return await this.userService.getUserById(id);
+    async getUser(@Param('id') userId: string): Promise<User> {
+        if (!isValidObjectId(userId)) throw new BadRequestException('UserId incorrect');
+        const user: User = await this.userService.getUserById(userId);
+        if (!user) throw new NotFoundException('User not found');
+        return user;
     }
 
     @Post()
@@ -27,12 +31,18 @@ export class UsersController {
 
     @Delete(':id')
     async deleteUser(@Param('id') userId: string): Promise<User> {
-        return await this.userService.deleteUser(userId);
+        if (!isValidObjectId(userId)) throw new BadRequestException('UserId incorrect');
+        const user: User = await this.userService.deleteUser(userId);
+        if (!user) throw new NotFoundException('User not found');
+        return user;
     }
 
     @Put(':id')
     async updateUser(@Body() user: CreateUserDto, @Param('id') userId: string): Promise<User> {
-        return await this.userService.updateUser(userId, user);
+        if (!isValidObjectId(userId)) throw new BadRequestException('UserId incorrect');
+        const userUpdated: User = await this.userService.updateUser(userId, user);
+        if (!userUpdated) throw new NotFoundException('User not found');
+        return userUpdated;
     }
 
 }
