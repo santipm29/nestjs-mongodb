@@ -14,6 +14,7 @@ async function bootstrap() {
       whitelist: true
     }),
   );
+  app.enableCors();
   await app.listen(3000);
   logger.log(`Server is running at ${await app.getUrl()}`);
 }
