@@ -11,11 +11,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true
+      whitelist: true,
     }),
   );
   app.enableCors();
-  await app.listen(3000);
+  await app.listen(process.env.APP_PORT);
   logger.log(`Server is running at ${await app.getUrl()}`);
 }
 bootstrap();
