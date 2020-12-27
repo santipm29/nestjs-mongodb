@@ -1,10 +1,18 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
+import { DatabaseService } from './config/database/database.service';
 
 @Module({
-  imports: [UsersModule, MongooseModule.forRoot('mongodb://localhost/nestexample')],
+  imports: [
+    ConfigModule.forRoot(),
+    MongooseModule.forRootAsync({
+      useClass: DatabaseService,
+    }),
+    UsersModule,
+  ],
   controllers: [],
-  providers: []
+  providers: [DatabaseService],
 })
 export class AppModule {}
