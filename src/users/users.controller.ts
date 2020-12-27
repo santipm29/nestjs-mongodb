@@ -1,48 +1,48 @@
-
+import { ObjectidPipe } from './../pipes/objectid.pipe';
 import { User } from './interfaces/user.interface';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/user.dto';
-import { Controller, Delete, Get, Post, Put, Body, Param, BadRequestException, NotFoundException } from '@nestjs/common';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import {
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { isValidObjectId } from 'mongoose';
-
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-    constructor(private userService: UserService) {}
-    @Get()
-    async getUsers(): Promise<User[]> {
-        return await this.userService.getUsers();
-    }
+  constructor(private userService: UserService) {}
 
-    @Get(':id')
-    async getUser(@Param('id') userId: string): Promise<User> {
-        if (!isValidObjectId(userId)) throw new BadRequestException('UserId incorrect');
-        const user: User = await this.userService.getUserById(userId);
-        if (!user) throw new NotFoundException('User not found');
-        return user;
-    }
+  @Get()
+  async getUsers(): Promise<User[]> {
+    return await this.userService.getUsers();
+  }
 
-    @Post()
-    async createUser(@Body() user: CreateUserDto): Promise<User> {
-        return await this.userService.createUser(user);
-    }
+  @Get(':id')
+  getUser(@Param('id', ObjectidPipe) userId: string): Promise<User> {
+    return this.userService.getUserById(userId);
+  }
 
-    @Delete(':id')
-    async deleteUser(@Param('id') userId: string): Promise<User> {
-        if (!isValidObjectId(userId)) throw new BadRequestException('UserId incorrect');
-        const user: User = await this.userService.deleteUser(userId);
-        if (!user) throw new NotFoundException('User not found');
-        return user;
-    }
+  @Post()
+  async createUser(@Body() user: CreateUserDto): Promise<User> {
+    return await this.userService.createUser(user);
+  }
 
-    @Put(':id')
-    async updateUser(@Body() user: CreateUserDto, @Param('id') userId: string): Promise<User> {
-        if (!isValidObjectId(userId)) throw new BadRequestException('UserId incorrect');
-        const userUpdated: User = await this.userService.updateUser(userId, user);
-        if (!userUpdated) throw new NotFoundException('User not found');
-        return userUpdated;
-    }
+  @Delete(':id')
+  deleteUser(@Param('id', ObjectidPipe) userId: string): Promise<User> {
+    return this.userService.deleteUser(userId);
+  }
 
+  @Put(':id')
+  async updateUser(
+    @Body() user: UpdateUserDto,
+    @Param('id', ObjectidPipe) userId: string,
+  ): Promise<User> {
+    return this.userService.updateUser(userId, user);
+  }
 }
